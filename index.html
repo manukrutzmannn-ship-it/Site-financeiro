@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176b4d">
+  <title>FinanFamília — Controle financeiro familiar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+
+  <main id="auth-screen" class="auth-layout">
+    <section class="auth-story">
+      <div class="brand brand-light"><span class="brand-mark">F</span><span>Finan<span>Família</span></span></div>
+      <div class="story-copy">
+        <span class="eyebrow">FINANÇAS MAIS LEVES</span>
+        <h1>Planos em família.<br><em>Futuro com tranquilidade.</em></h1>
+        <p>Organize o dinheiro da casa, acompanhe os gastos e transforme objetivos em planos possíveis.</p>
+        <div class="story-points">
+          <div><span class="point-icon">✓</span> Tudo organizado em um só lugar</div>
+          <div><span class="point-icon">✓</span> Metas e orçamento compartilhados</div>
+          <div><span class="point-icon">✓</span> Seus dados protegidos por acesso individual</div>
+        </div>
+      </div>
+      <div class="story-foot">Um passo de cada vez. Juntos.</div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-mobile-brand brand"><span class="brand-mark">F</span><span>Finan<span>Família</span></span></div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="tab active" data-auth-tab="login">Entrar</button>
+          <button class="tab" data-auth-tab="signup">Criar conta</button>
+        </div>
+        <div id="login-form">
+          <h2>Bem-vindo de volta</h2>
+          <p class="muted">Entre para acompanhar as finanças da sua família.</p>
+          <form id="login">
+            <label for="login-email">E-mail</label>
+            <input id="login-email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+            <label for="login-password">Senha</label>
+            <input id="login-password" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+            <button class="btn btn-primary btn-full" type="submit">Entrar na minha conta <span>→</span></button>
+          </form>
+          <button id="forgot-password" class="text-button">Esqueci minha senha</button>
+        </div>
+        <div id="signup-form" hidden>
+          <h2>Crie sua conta</h2>
+          <p class="muted">Comece a organizar o orçamento da casa.</p>
+          <form id="signup">
+            <label for="signup-name">Seu nome</label>
+            <input id="signup-name" type="text" autocomplete="name" placeholder="Como podemos te chamar?" required maxlength="80">
+            <label for="signup-email">E-mail</label>
+            <input id="signup-email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+            <label for="signup-password">Senha</label>
+            <input id="signup-password" type="password" autocomplete="new-password" placeholder="Pelo menos 8 caracteres" minlength="8" required>
+            <label for="family-name">Nome da família</label>
+            <input id="family-name" type="text" placeholder="Ex.: Família Silva" maxlength="80" required>
+            <button class="btn btn-primary btn-full" type="submit">Criar conta e família <span>→</span></button>
+          </form>
+          <p class="fine-print">Ao criar a conta, você será o administrador inicial da família. Convites para outros membros podem ser adicionados depois.</p>
+        </div>
+        <p class="secure-note"><span>♧</span> Acesso privado com autenticação segura</p>
+        <div id="setup-warning" class="setup-warning" hidden>
+          <strong>Falta conectar o Supabase</strong>
+          <p>Abra <code>app.js</code> e preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> com os dados do seu projeto.</p>
+        </div>
+      </div>
+      <footer class="auth-footer">© 2026 FinanFamília · Feito para cuidar do que importa</footer>
+    </section>
+  </main>
+
+  <div id="app-screen" class="app-layout" hidden>
+    <aside class="sidebar">
+      <a class="brand sidebar-brand" href="#"><span class="brand-mark">F</span><span>Finan<span>Família</span></span></a>
+      <div class="family-switch"><span class="family-avatar">⌂</span><div><small>ESPAÇO FAMILIAR</small><strong id="family-name-label">Minha família</strong></div></div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão geral</button>
+        <button class="nav-item" data-view="transactions"><span>↕</span> Movimentações</button>
+        <button class="nav-item" data-view="bills"><span>▣</span> Contas a pagar</button>
+        <button class="nav-item" data-view="goals"><span>◎</span> Metas financeiras</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><span class="help-icon">✳</span><strong>Um futuro mais leve</strong><p>Pequenos hábitos fazem diferença no orçamento.</p></div>
+        <button id="signout" class="nav-item signout"><span>↪</span> Sair da conta</button>
+        <div class="user-mini"><div id="user-avatar" class="user-avatar">F</div><div><strong id="user-name">Usuário</strong><small id="user-email"></small></div></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div><div class="breadcrumb">Finanças <span>/</span> <strong id="page-title">Visão geral</strong></div><p id="today-label" class="muted top-date"></p></div>
+        <div class="top-actions"><button id="toggle-values" class="icon-button" title="Ocultar ou mostrar valores" aria-label="Ocultar ou mostrar valores">◉</button><button id="open-add" class="btn btn-primary"><span>＋</span> Nova movimentação</button></div>
+      </header>
+
+      <section id="dashboard-view" class="view">
+        <div class="welcome-row"><div><span class="eyebrow">SEU RESUMO FINANCEIRO</span><h1>As finanças da família <span>em equilíbrio.</span></h1><p class="muted">Acompanhe o que entrou, o que saiu e os próximos passos.</p></div><div class="month-pill"><span class="calendar-icon">▦</span><span id="month-label">Este mês</span></div></div>
+        <div class="stats-grid">
+          <article class="stat-card balance-card"><div class="stat-top"><span>Saldo registrado</span><span class="stat-icon green-icon">↗</span></div><div id="total-balance" class="stat-value">R$ 0,00</div><div class="stat-foot"><span class="tiny-dot"></span> Receitas menos despesas registradas</div><div class="balance-decoration"></div></article>
+          <article class="stat-card"><div class="stat-top"><span>Receitas do mês</span><span class="stat-icon mint-icon">＋</span></div><div id="month-income" class="stat-value">R$ 0,00</div><div class="stat-foot muted">Entradas neste mês</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Despesas do mês</span><span class="stat-icon rose-icon">↘</span></div><div id="month-expense" class="stat-value">R$ 0,00</div><div class="stat-foot muted">Saídas neste mês</div></article>
+          <article class="stat-card"><div class="stat-top"><span>Resultado do mês</span><span class="stat-icon gold-icon">≈</span></div><div id="month-result" class="stat-value">R$ 0,00</div><div class="stat-foot muted">Receitas − despesas</div></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel chart-panel"><div class="panel-heading"><div><h2>Resumo mensal</h2><p class="muted">Receitas e despesas por mês</p></div><span class="panel-badge">Últimos 6 meses</span></div><div id="monthly-chart" class="chart" aria-label="Gráfico mensal"><div class="empty-state">Adicione movimentações para ver seu gráfico.</div></div><div class="chart-legend"><span><i class="legend-income"></i> Receitas</span><span><i class="legend-expense"></i> Despesas</span></div></article>
+          <article class="panel category-panel"><div class="panel-heading"><div><h2>Onde você gastou</h2><p class="muted">Despesas deste mês</p></div></div><div id="category-list" class="category-list"><div class="empty-state">As categorias aparecem aqui.</div></div></article>
+        </div>
+        <article class="panel recent-panel"><div class="panel-heading"><div><h2>Últimas movimentações</h2><p class="muted">O que aconteceu recentemente</p></div><button class="text-button" data-goto="transactions">Ver todas →</button></div><div id="recent-list" class="transaction-list"><div class="empty-state">Nenhuma movimentação cadastrada ainda.</div></div></article>
+      </section>
+
+      <section id="transactions-view" class="view" hidden>
+        <div class="page-heading"><div><span class="eyebrow">ENTRADAS E SAÍDAS</span><h1>Movimentações</h1><p class="muted">Tudo que entra e sai do orçamento familiar.</p></div><button class="btn btn-primary" id="open-add-2">＋ Adicionar movimentação</button></div>
+        <article class="panel"><div class="table-toolbar"><input id="transaction-search" type="search" placeholder="Buscar por descrição ou categoria…"><select id="transaction-filter"><option value="all">Todas</option><option value="income">Só receitas</option><option value="expense">Só despesas</option></select></div><div id="all-transactions" class="transaction-list"><div class="empty-state">Carregando movimentações…</div></div></article>
+      </section>
+
+      <section id="bills-view" class="view" hidden>
+        <div class="page-heading"><div><span class="eyebrow">ORGANIZE OS VENCIMENTOS</span><h1>Contas a pagar</h1><p class="muted">Cadastre contas recorrentes ou pontuais e acompanhe o status.</p></div><button class="btn btn-primary" id="open-bill">＋ Nova conta</button></div>
+        <div id="bills-list" class="bill-grid"><div class="empty-state">Nenhuma conta cadastrada.</div></div>
+      </section>
+
+      <section id="goals-view" class="view" hidden>
+        <div class="page-heading"><div><span class="eyebrow">SONHOS COM PLANEJAMENTO</span><h1>Metas financeiras</h1><p class="muted">Defina um objetivo e acompanhe o progresso da família.</p></div><button class="btn btn-primary" id="open-goal">＋ Nova meta</button></div>
+        <div id="goals-list" class="goal-grid"><div class="empty-state">Nenhuma meta cadastrada.</div></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="transaction-modal" class="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="transaction-modal-title">
+      <div class="modal-head"><div><span class="eyebrow">REGISTRO FINANCEIRO</span><h2 id="transaction-modal-title">Nova movimentação</h2></div><button class="close-modal" data-close="transaction-modal" aria-label="Fechar">×</button></div>
+      <form id="transaction-form">
+        <div class="type-toggle"><label><input type="radio" name="type" value="expense" checked><span>− Despesa</span></label><label><input type="radio" name="type" value="income"><span>＋ Receita</span></label></div>
+        <label for="tx-description">Descrição</label><input id="tx-description" required maxlength="120" placeholder="Ex.: Mercado, salário, internet">
+        <div class="form-row"><div><label for="tx-amount">Valor (R$)</label><input id="tx-amount" type="number" min="0.01" step="0.01" required placeholder="0,00"></div><div><label for="tx-date">Data</label><input id="tx-date" type="date" required></div></div>
+        <div class="form-row"><div><label for="tx-category">Categoria</label><select id="tx-category"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Saúde</option><option>Educação</option><option>Lazer</option><option>Salário</option><option>Freelance</option><option>Contas da casa</option><option>Compras</option><option>Transferência</option><option>Outros</option></select></div><div><label for="tx-person">Responsável</label><input id="tx-person" maxlength="80" placeholder="Nome (opcional)"></div></div>
+        <label for="tx-notes">Observações <span class="optional">(opcional)</span></label><textarea id="tx-notes" rows="2" maxlength="500" placeholder="Algum detalhe importante?"></textarea>
+        <div class="modal-actions"><button type="button" class="btn btn-secondary" data-close="transaction-modal">Cancelar</button><button type="submit" class="btn btn-primary">Salvar movimentação</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div id="bill-modal" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true"><div class="modal-head"><div><span class="eyebrow">CONTAS DA CASA</span><h2>Nova conta a pagar</h2></div><button class="close-modal" data-close="bill-modal">×</button></div><form id="bill-form"><label for="bill-title">Nome da conta</label><input id="bill-title" required maxlength="120" placeholder="Ex.: Conta de luz"><div class="form-row"><div><label for="bill-amount">Valor (R$)</label><input id="bill-amount" type="number" min="0.01" step="0.01" required></div><div><label for="bill-due">Vencimento</label><input id="bill-due" type="date" required></div></div><label for="bill-category">Categoria</label><select id="bill-category"><option>Moradia</option><option>Contas da casa</option><option>Educação</option><option>Saúde</option><option>Transporte</option><option>Outros</option></select><div class="modal-actions"><button type="button" class="btn btn-secondary" data-close="bill-modal">Cancelar</button><button type="submit" class="btn btn-primary">Salvar conta</button></div></form></section></div>
+
+  <div id="goal-modal" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true"><div class="modal-head"><div><span class="eyebrow">PLANEJAMENTO</span><h2>Nova meta financeira</h2></div><button class="close-modal" data-close="goal-modal">×</button></div><form id="goal-form"><label for="goal-title">Nome da meta</label><input id="goal-title" required maxlength="120" placeholder="Ex.: Reserva de emergência"><div class="form-row"><div><label for="goal-target">Valor desejado (R$)</label><input id="goal-target" type="number" min="0.01" step="0.01" required></div><div><label for="goal-saved">Já guardado (R$)</label><input id="goal-saved" type="number" min="0" step="0.01" value="0" required></div></div><label for="goal-deadline">Prazo (opcional)</label><input id="goal-deadline" type="date"><div class="modal-actions"><button type="button" class="btn btn-secondary" data-close="goal-modal">Cancelar</button><button type="submit" class="btn btn-primary">Criar meta</button></div></form></section></div>
+</body>
+</html>
